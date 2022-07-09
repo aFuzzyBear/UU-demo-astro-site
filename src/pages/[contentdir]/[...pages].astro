@@ -1,0 +1,48 @@
+---
+export async function getStaticPaths({}){
+    let cache ={}
+    const Contents = await Astro.glob('../../../content/**/*.md')
+    console.log("Astro Glob Results", Contents)
+    let results = []
+    for(let page of Contents){
+        let directorySplitUp = page.file.split('/')
+        let getSlug = directorySplitUp.at(-2)
+        let ContentIndex = directorySplitUp.findIndex(x=> x ==='content')
+        console.log(getSlug)
+        console.log(ContentIndex)
+        const directoryPaths = (directorySplitUp.slice(ContentIndex)).splice(1,directorySplitUp.slice(ContentIndex).length-3)
+        console.log(directoryPaths)
+        results.push({
+            contentDirectories: directoryPaths,
+            slug: getSlug,
+            props:page
+        })
+    }
+    // console.log(results)
+    return results.map((file)=>({
+        params:{
+            contentdir: file.contentDirectories.join('/'),
+            pages: file.slug
+        },
+        props:{
+            props: file.props
+        }
+    }))
+    
+}
+
+// console.log(Astro.params)
+const {Content} = Astro.props.props
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <Content/>
+</body>
+</html>
